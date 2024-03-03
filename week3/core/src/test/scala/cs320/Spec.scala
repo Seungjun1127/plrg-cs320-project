@@ -39,6 +39,7 @@ class Spec extends SpecBase {
   test(run("{ val x = max(9, 7, 10); max(8, x, (1 + x)) }"), List(11))
   test(run("(min(6, 4, 5) - max(2, 3, 4))"), List(0))
   test(run("{ val x = (7 + 2); min(x, 7, 0) }"), List(0))
+  test(run("{ val x = (7, 2); min(x, 7, 0) }"), List(0, 0))
   test(run("{ val x = (13); min(x, 1, 12) }"), List(1))
   test(run("{ val x = min(2, 1, 3); (x + x) }"), List(2))
   test(run("{ val a = 10; { val b = 19; { val c = 2; min(a, b, c) } } }"), List(2))
