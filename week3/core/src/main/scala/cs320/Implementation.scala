@@ -16,9 +16,6 @@ object Implementation extends Template {
     def lookup(name: String, env: Map[String, List[Int]]): List[Int] = 
       env.getOrElse(name, error(s"free identifier: $name"))
 
-    def bigger(n1: Int, n2: Int) = if (n1 < n2) n2 else n1
-    def smaller(n1: Int, n2: Int) = if (n1 < n2) n1 else n2
-
     def interprete(expr: Expr, env: Map[String, List[Int]]): List[Int] = expr match {
       case Num(v) => v
       case Add(ls, rs) => binOp(_ + _, interprete(ls, env), interprete(rs, env))
@@ -26,12 +23,12 @@ object Implementation extends Template {
       case Val(x, es, body) => interprete(body, env ++ Map(x->interprete(es, env)))
       case Id(x) => lookup(x, env)
       case Min(e1, e2, e3) => {
-        val es = binOp(smaller(_, _), interprete(e1, env), interprete(e2, env))
-        binOp(smaller(_, _), es, interprete(e3, env))
+        val es = binOp(_ min _, interprete(e1, env), interprete(e2, env))
+        binOp(_ min _, es, interprete(e3, env))
       }
       case Max(e1, e2, e3) => {
-        val es = binOp(bigger(_, _), interprete(e1, env), interprete(e2, env))
-        binOp(bigger(_, _), es, interprete(e3, env))
+        val es = binOp(_ max _, interprete(e1, env), interprete(e2, env))
+        binOp(_ max _, es, interprete(e3, env))
       }
     }
 

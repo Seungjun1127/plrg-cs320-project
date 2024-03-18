@@ -1,34 +1,27 @@
 package cs320
 
 object Implementation extends Template {
-
-  def freeIds(expr: Expr): Set[String] = {
-    def free_recursive(body: Expr, env: Set[String]): Set[String] = body match {
-      case Num(_) => Set()
-      case Add(l, r) => free_recursive(l, env) ++ free_recursive(r, env)
-      case Sub(l, r) => free_recursive(l, env) ++ free_recursive(r, env)
-      case Id(x) => if (env.contains(x)) Set() else Set(x)
-      case Val(x, e1, e2) => free_recursive(e1, env) ++ free_recursive(e2, env ++ Set(x))
-    }
-    free_recursive(expr, Set())
+  def freeIds(expr: Expr): Set[String] = expr match {
+    case Num(value) => Set()
+    case Add(left, right) => freeIds(left)|freeIds(right)
+    case Sub(left, right) => freeIds(left)|freeIds(right)
+    case Id(id) => Set(id)
+    case Val(name, expr, body) => freeIds(expr)|freeIds(body)-name
   }
 
   def bindingIds(expr: Expr): Set[String] = expr match {
-    case Num(_) => Set()
-    case Add(l, r) => bindingIds(l) ++ bindingIds(r)
-    case Sub(l, r) => bindingIds(l) ++ bindingIds(r)
-    case Id(x) => Set()
-    case Val(x, e1, e2) => bindingIds(e1) ++ Set(x) ++ bindingIds(e2)
+    case Num(value) => Set()
+    case Add(left, right) => bindingIds(left)|bindingIds(right)
+    case Sub(left, right) => bindingIds(left)|bindingIds(right)
+    case Id(id) => Set()
+    case Val(name, expr, body) => bindingIds(expr)|bindingIds(body)+name
   }
 
-  def boundIds(expr: Expr): Set[String] = {
-    def bound_recursive(body: Expr, env: Set[String]): Set[String] = body match {
-      case Num(_) => Set()
-      case Add(l, r) => bound_recursive(l, env) ++ bound_recursive(r, env)
-      case Sub(l, r) => bound_recursive(l, env) ++ bound_recursive(r, env)
-      case Id(x) => if (env.contains(x)) Set(x) else Set()
-      case Val(x, e1, e2) => bound_recursive(e1, env) ++ bound_recursive(e2, env ++ Set(x))
-    }
-    bound_recursive(expr, Set())
+  def boundIds(expr: Expr): Set[String] = expr match {
+    case Num(value) => Set()
+    case Add(left, right) => boundIds(left)|boundIds(right)
+    case Sub(left, right) => boundIds(left)|boundIds(right)
+    case Id(id) => Set()
+    case Val(name, expr, body) => boundIds(expr)|boundIds(body)|(freeIds(body)&Set(name))
   }
 }
